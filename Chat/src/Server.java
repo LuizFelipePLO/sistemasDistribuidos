@@ -1,7 +1,7 @@
 // Instruções:
 // 1. Execute a classe Server.java
 // 2. Execute Client.java o número de vezes igual a quantos clientes você desejar
-// 3. Mande mensagens com o seguinte formato: mensagem # remetente
+// 3. Mande mensagens com o seguinte formato: mensagem # cliente
 
 import java.io.*;
 import java.util.*;
@@ -15,34 +15,34 @@ public class Server {
 
 	public static void main(String[] args) throws IOException {
 
-		try (ServerSocket ss = new ServerSocket(1234)) {
-			Socket s;
+		ServerSocket ss = new ServerSocket(1234);
 
-			// loop infinito para o requisição de cliente
-			while (true) {
+		Socket s;
 
-				s = ss.accept();
+		// loop infinito para o requisição de cliente
+		while (true) {
 
-				System.out.println("New client request received : " + s);
+			s = ss.accept();
 
-				DataInputStream dis = new DataInputStream(s.getInputStream());
-				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+			System.out.println("New client request received : " + s);
 
-				System.out.println("Creating a new handler for this client...");
+			DataInputStream dis = new DataInputStream(s.getInputStream());
+			DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
-				ClientHandler mtch = new ClientHandler(s, "client " + clientTotal, dis, dos);
+			System.out.println("Creating a new handler for this client...");
 
-				Thread t = new Thread(mtch);
+			ClientHandler mtch = new ClientHandler(s, "client " + clientTotal, dis, dos);
 
-				System.out.println("Adding this client to active client list");
+			Thread t = new Thread(mtch);
 
-				ar.add(mtch);
+			System.out.println("Adding this client to active client list");
 
-				t.start();
+			ar.add(mtch);
 
-				clientTotal++;
+			t.start();
 
-			}
+			clientTotal++;
+
 		}
 	}
 }
