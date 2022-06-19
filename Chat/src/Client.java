@@ -19,11 +19,9 @@ public class Client {
             public void run() {
                 while (true) {
 
-                    // read the message to deliver.
                     String msg = sc.nextLine();
 
                     try {
-                        // write on the output stream
                         dos.writeUTF(msg);
                     } catch (IOException e) {
                         e.printStackTrace();
