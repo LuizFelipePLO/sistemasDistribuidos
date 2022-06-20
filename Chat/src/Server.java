@@ -84,7 +84,7 @@ class ClientHandler implements Runnable {
 				}
 
 				// parte a string entre mensagem e recipiente
-				StringTokenizer st = new StringTokenizer(received, " # ");
+				StringTokenizer st = new StringTokenizer(received, "#");
 				String MsgToSend = st.nextToken();
 				String recipient = st.nextToken();
 
