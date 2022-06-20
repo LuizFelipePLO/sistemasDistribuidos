@@ -69,7 +69,6 @@ class ClientHandler implements Runnable {
 		String received;
 		while (true) {
 			try {
-				// receive the string
 				received = dis.readUTF();
 
 				System.out.println(received);
@@ -81,7 +80,7 @@ class ClientHandler implements Runnable {
 				}
 
 				// divide a string em mensagem e recipiente
-				StringTokenizer st = new StringTokenizer(received, "#");
+				StringTokenizer st = new StringTokenizer(received, " # ");
 				String MsgToSend = st.nextToken();
 				String recipient = st.nextToken();
 
