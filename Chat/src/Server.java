@@ -1,7 +1,10 @@
+//Feito por Bárbara Ville e Luiz Felipe Oliveira
 // Instruções:
 // 1. Execute a classe Server.java
 // 2. Execute Client.java o número de vezes igual a quantos clientes você desejar
-// 3. Mande mensagens com o seguinte formato: mensagem # cliente
+// 3. Mande mensagens com o seguinte formato: 
+// mensagem # client (índice da ordem que foi criado e.g client 1 se foi o primeiro client a ser criado...)
+// 4. escreva "sair" para desativar um cliente
 // obs: não utilize Ctrl+Alt+N para rodar as classes, o VS Code não reconhece os arquivos
 
 import java.io.*;
@@ -18,26 +21,30 @@ public class Server {
 	public static void main(String[] args) throws IOException {
 
 		ServerSocket ss = new ServerSocket(1234);
-
+		Scanner sc = new Scanner(System.in);
 		Socket soc;
+		String name;
 
 		// Laço para requisição de clientes
 		while (true) {
 			soc = ss.accept();
 
-			System.out.println("New client request received : " + soc);
+			System.out.println("Nova requisição de cliente recebida: " + soc);
 
 			// Streams de entrada e saída
 			DataInputStream dis = new DataInputStream(soc.getInputStream());
 			DataOutputStream dos = new DataOutputStream(soc.getOutputStream());
 
-			System.out.println("Creating a new handler for this client...");
+			System.out.println("Criando um controlador para o cliente...");
+			System.out.println("Escreva seu nome: ");
+			name = sc.nextLine();
+			System.out.println("Bem-vindo, " + name + "!");
 
-			ClientHandler ch = new ClientHandler(soc, "client " + clientTotal, dis, dos);
+			ClientHandler ch = new ClientHandler(soc, name, dis, dos);
 
 			Thread t = new Thread(ch);
 
-			System.out.println("Adding this client to active client list");
+			System.out.println("Ativando cliente...");
 
 			ClientList.add(ch);
 
@@ -50,8 +57,8 @@ public class Server {
 }
 
 class ClientHandler implements Runnable {
-	Scanner scn = new Scanner(System.in);
-	private String name;
+	Scanner sc = new Scanner(System.in);
+	String name;
 	final DataInputStream dis;
 	final DataOutputStream dos;
 	Socket soc;
@@ -61,8 +68,8 @@ class ClientHandler implements Runnable {
 			DataInputStream dis, DataOutputStream dos) {
 		this.dis = dis;
 		this.dos = dos;
-		this.name = name;
 		this.soc = soc;
+		this.name = name;
 		this.isLoggedIn = true;
 	}
 
@@ -71,28 +78,29 @@ class ClientHandler implements Runnable {
 
 		String received;
 		while (true) {
+
 			try {
 
 				received = dis.readUTF();
 
 				System.out.println(received);
 
-				if (received.equals("logout")) {
+				if (received.equals("sair")) {
 					this.isLoggedIn = false;
 					this.soc.close();
 					break;
 				}
 
-				// parte a string entre mensagem e recipiente
+				// parte a string entre mensagem e destinatário
 				StringTokenizer st = new StringTokenizer(received, "#");
 				String MsgToSend = st.nextToken();
 				String recipient = st.nextToken();
 
 				// Procura o destinatário na lista de clientes
-				for (ClientHandler mc : Server.ClientList) {
+				for (ClientHandler ch : Server.ClientList) {
 					// Se encontrado, envia a mensagem para o cliente indicado
-					if (mc.name.equals(recipient) && mc.isLoggedIn == true) {
-						mc.dos.writeUTF(this.name + " : " + MsgToSend);
+					if (ch.name.equals(recipient) && ch.isLoggedIn == true) {
+						ch.dos.writeUTF(this.name + " : " + MsgToSend);
 						break;
 					}
 				}
