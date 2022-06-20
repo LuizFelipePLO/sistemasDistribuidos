@@ -4,83 +4,66 @@
 // 3. Mande mensagens com o seguinte formato: mensagem # cliente
 // obs: não utilize Ctrl+Alt+N para rodar as classes, o VS Code não reconhece os arquivos
 
-// Java implementation of Server side
-// It contains two classes : Server and ClientHandler
-// Save file as Server.java
-
 import java.io.*;
 import java.util.*;
 import java.net.*;
 
-// Server class
 public class Server {
 
-	// Vector to store active clients
-	static Vector<ClientHandler> ar = new Vector<>();
+	// Vetor para armazenar clientes
+	static Vector<ClientHandler> ClientList = new Vector<>();
 
-	// counter for clients
-	static int i = 0;
+	static int clientTotal = 1;
 
 	public static void main(String[] args) throws IOException {
-		// server is listening on port 1234
+
 		ServerSocket ss = new ServerSocket(1234);
 
-		Socket s;
+		Socket soc;
 
-		// running infinite loop for getting
-		// client request
+		// Laço para requisição de clientes
 		while (true) {
-			// Accept the incoming request
-			s = ss.accept();
+			soc = ss.accept();
 
-			System.out.println("New client request received : " + s);
+			System.out.println("New client request received : " + soc);
 
-			// obtain input and output streams
-			DataInputStream dis = new DataInputStream(s.getInputStream());
-			DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+			// Streams de entrada e saída
+			DataInputStream dis = new DataInputStream(soc.getInputStream());
+			DataOutputStream dos = new DataOutputStream(soc.getOutputStream());
 
 			System.out.println("Creating a new handler for this client...");
 
-			// Create a new handler object for handling this request.
-			ClientHandler mtch = new ClientHandler(s, "client " + i, dis, dos);
+			ClientHandler ch = new ClientHandler(soc, "client " + clientTotal, dis, dos);
 
-			// Create a new Thread with this object.
-			Thread t = new Thread(mtch);
+			Thread t = new Thread(ch);
 
 			System.out.println("Adding this client to active client list");
 
-			// add this client to active clients list
-			ar.add(mtch);
+			ClientList.add(ch);
 
-			// start the thread.
 			t.start();
 
-			// increment i for new client.
-			// i is used for naming only, and can be replaced
-			// by any naming scheme
-			i++;
+			clientTotal++;
 
 		}
 	}
 }
 
-// ClientHandler class
 class ClientHandler implements Runnable {
 	Scanner scn = new Scanner(System.in);
 	private String name;
 	final DataInputStream dis;
 	final DataOutputStream dos;
-	Socket s;
-	boolean isloggedin;
+	Socket soc;
+	boolean isLoggedIn;
 
-	// constructor
-	public ClientHandler(Socket s, String name,
+	public ClientHandler(Socket soc, String name,
 			DataInputStream dis, DataOutputStream dos) {
 		this.dis = dis;
 		this.dos = dos;
 		this.name = name;
-		this.s = s;
-		this.isloggedin = true;
+		this.soc = soc;
+		this.isLoggedIn = true;
 	}
 
 	@Override
@@ -89,28 +72,26 @@ class ClientHandler implements Runnable {
 		String received;
 		while (true) {
 			try {
-				// receive the string
+
 				received = dis.readUTF();
 
 				System.out.println(received);
 
 				if (received.equals("logout")) {
-					this.isloggedin = false;
-					this.s.close();
+					this.isLoggedIn = false;
+					this.soc.close();
 					break;
 				}
 
-				// break the string into message and recipient part
-				StringTokenizer st = new StringTokenizer(received, "#");
+				// parte a string entre mensagem e recipiente
+				StringTokenizer st = new StringTokenizer(received, " # ");
 				String MsgToSend = st.nextToken();
 				String recipient = st.nextToken();
 
-				// search for the recipient in the connected devices list.
-				// ar is the vector storing client of active users
-				for (ClientHandler mc : Server.ar) {
-					// if the recipient is found, write on its
-					// output stream
-					if (mc.name.equals(recipient) && mc.isloggedin == true) {
+				// Procura o destinatário na lista de clientes
+				for (ClientHandler mc : Server.ClientList) {
+					// Se encontrado, envia a mensagem para o cliente indicado
+					if (mc.name.equals(recipient) && mc.isLoggedIn == true) {
 						mc.dos.writeUTF(this.name + " : " + MsgToSend);
 						break;
 					}
@@ -122,7 +103,6 @@ class ClientHandler implements Runnable {
 
 		}
 		try {
-			// closing resources
 			this.dis.close();
 			this.dos.close();
 

@@ -14,23 +14,21 @@ public class Client {
         InetAddress ip = InetAddress.getByName("localhost");
 
         // Conexão
-        Socket s = new Socket(ip, ServerPort);
+        Socket soc = new Socket(ip, ServerPort);
 
-        // obtaining input and out streams
-        DataInputStream dis = new DataInputStream(s.getInputStream());
-        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        // Declaração das streams de entrada e saída
+        DataInputStream dis = new DataInputStream(soc.getInputStream());
+        DataOutputStream dos = new DataOutputStream(soc.getOutputStream());
 
-        // sendMessage thread
         Thread sendMessage = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
 
-                    // read the message to deliver.
                     String msg = sc.nextLine();
 
                     try {
-                        // write on the output stream
+                        // escreve na stream de saída
                         dos.writeUTF(msg);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -39,14 +37,13 @@ public class Client {
             }
         });
 
-        // readMessage thread
         Thread readMessage = new Thread(new Runnable() {
             @Override
             public void run() {
 
                 while (true) {
                     try {
-                        // read the message sent to this client
+                        // lê a mensagem enviada para o cliente
                         String msg = dis.readUTF();
                         System.out.println(msg);
                     } catch (IOException e) {
