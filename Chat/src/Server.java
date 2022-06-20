@@ -1,10 +1,10 @@
 //Feito por Bárbara Ville e Luiz Felipe Oliveira
 // Instruções:
 // 1. Execute a classe Server.java
-// 2. Execute Client.java o número de vezes igual a quantos clientes você desejar
-// 3. Mande mensagens com o seguinte formato: 
-// mensagem # client (índice da ordem que foi criado e.g client 1 se foi o primeiro client a ser criado...)
+// 2. Execute Client.java e coloque o nome que desejar no terminal Server.java
+// 3. Mande mensagens com o seguinte formato: mensagem#nome do destinatário, 
 // 4. escreva "sair" para desativar um cliente
+// 5. Repita o processo 2 para mais clientes
 // obs: não utilize Ctrl+Alt+N para rodar as classes, o VS Code não reconhece os arquivos
 
 import java.io.*;
@@ -86,6 +86,7 @@ class ClientHandler implements Runnable {
 				System.out.println(received);
 
 				if (received.equals("sair")) {
+					System.out.println(name + " saindo...");
 					this.isLoggedIn = false;
 					this.soc.close();
 					break;

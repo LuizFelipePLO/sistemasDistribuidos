@@ -1,6 +1,3 @@
-// Java implementation for multithreaded chat client
-// Save file as Client.java
-
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
